@@ -36,3 +36,9 @@
     transform: rotate(360deg);
   }
 }
+.my-button {
+  background-color: blue; 
+  color: white; 
+  padding: 10px 20px; 
+}
+<button className="my-button">Clone</button>
