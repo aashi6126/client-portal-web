@@ -35,6 +35,16 @@ function App() {
     setCurrentCustomer(customer);
     setIsModalOpen(true);
   }
+  
+  function createCustomer(customer) {
+    axios.post('http://127.0.0.1:5000/api/customers', customer)
+      .then(response => {
+        // alert(`New customer created successfully`);s
+        setCustomers(prevCustomers => [...prevCustomers, response.data]);
+        setIsModalOpen(false);
+      })
+      .catch(error => console.error('Error creating customer:', error));
+  }
 
   function saveCustomer(currentCustomer) {
     // alert(`Save customer with id ${currentCustomer.Customer_id}`);
@@ -94,6 +104,7 @@ function cloneCustomer(customer) {
 }
 
 function fetchCustomers() {
+  // alert('Fetching customers');
   fetch('http://127.0.0.1:5000/api/customers')
     .then(response => response.json())
     .then(data => {
@@ -139,7 +150,7 @@ function handleFileUpload(event) {
     const worksheet = workbook.Sheets[sheetName];
     const jsonData = XLSX.utils.sheet_to_json(worksheet);
     //console.log('Imported data:', jsonData); // Debugging log
-    jsonData.forEach(customer => saveCustomer(customer));
+    jsonData.forEach(customer => createCustomer(customer));
     setCustomers(jsonData);
   };
   reader.readAsArrayBuffer(file);
@@ -172,6 +183,7 @@ console.log('Customers state before rendering:', customers); // Debugging log
           onChange={handleSearchInput}
           style={{ padding: '5px', width: '300px' }}
         />
+        <span>Total Customers: {customers.length}</span>
         <div>
           <button onClick={exportToExcel} className="btn btn-primary btn-sm" style={{ marginRight: '20px' }}>
             Export Excel
@@ -221,6 +233,7 @@ console.log('Customers state before rendering:', customers); // Debugging log
               <th scope="col">Employer</th>
               <th scope="col">Employee</th>
               <th scope="col">Product</th>
+              <th scope="col">Client Manager</th>
               <th scope="col">Actions</th>
             </tr>
           </thead>
@@ -256,6 +269,7 @@ console.log('Customers state before rendering:', customers); // Debugging log
                 <td>{customer.Employer}</td>
                 <td>{customer.Employee}</td>
                 <td>{customer.Product}</td>
+                <td>{customer.Client_Manager}</td>
                 {/* Add all other data here */}
                 <td style={{ width: '200px' }}>
                     <button style={{ marginRight: '4px' }} className="btn btn-outline-primary btn-sm" onClick={() => openModal(customer)}>
@@ -272,7 +286,7 @@ console.log('Customers state before rendering:', customers); // Debugging log
             )) 
             ) : (
               <tr>
-                <td colSpan="28">No customers found.</td>
+                <td colSpan="29">No customers found.</td>
               </tr>
             )}
           </tbody>
@@ -717,12 +731,13 @@ console.log('Customers state before rendering:', customers); // Debugging log
                     }
                     />
                     </div>
+                    
                     <div className="form-group col">
                       <label htmlFor="Product">Product</label>
                       <input
                         type="text"
                         className="form-control"
-                        id="Product"
+                        id="product"
                         value={currentCustomer.Product}
                         onChange={(e) =>
                           setCurrentCustomer({
@@ -731,12 +746,33 @@ console.log('Customers state before rendering:', customers); // Debugging log
                           })
                         }
                   />
+                  <div className="row">
+                    <div className="form-group col">
+                        <label htmlFor="Client_Manager">Client Manager</label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="Client_Manager"
+                          value={currentCustomer.Client_Manager}
+                          onChange={(e) =>
+                            setCurrentCustomer({
+                              ...currentCustomer,
+                              Client_Manager: e.target.value,
+                            })
+                          }
+                    />
+                    <div className="form-group col">
+                      s
+                    </div>
+                  </div>
+                  </div>
                 </div>
                 </div>
-                </>
-              )}
+              
               <button  className="btn btn-outline-primary btn-sm" onClick={() => saveCustomer(currentCustomer)}>Save</button>
               <button   className="btn btn-outline-primary btn-sm" onClick={() => setIsModalOpen(false)}>Cancel</button>
+              </>
+              )}
             </form>
           </Modal>          
       </div>
@@ -744,6 +780,6 @@ console.log('Customers state before rendering:', customers); // Debugging log
     </>
   );
 }
-      export default App;
+export default App;
 
 
